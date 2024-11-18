@@ -20,9 +20,4 @@ headers = {
 
 
 
- #Tri par popularité pour ne pas avoir un homonyme
-
-
-
-
 

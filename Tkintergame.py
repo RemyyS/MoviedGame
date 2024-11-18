@@ -16,21 +16,13 @@ headers = {
 }
 
 
-search = tmdb.Search()
-response = search.person(query="Ruffalo")
 
-tentative = {}
-for s in search.results:
-    tentative[s['name']] = s['popularity']
-    
-#print (tentative)
 
-tentativesorted = dict(sorted(tentative.items(), key=lambda item: item[1], reverse=True)) #Tri par popularité pour ne pas avoir un homonyme
-person_most_popular_name = ""
-#print (tentativesorted)
-for x in tentativesorted.items():
-    person_most_popular_name = (x[0])
-    break
 
-print(person_most_popular_name)
-print(Testing.FindingPersonID(person_most_popular_name))
+
+ #Tri par popularité pour ne pas avoir un homonyme
+
+
+
+
+

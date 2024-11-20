@@ -94,3 +94,21 @@ def JeuCompletFilm(NameOfActor: str) -> dict[str, str]:
 
 
 
+"""
+#Peut être utile
+response = tmdb.Trending(media_type='movie', time_window='week').info()
+increasingnumber = 0
+for c in response['results']:
+    print (response['results'][increasingnumber]['title'])
+    increasingnumber +=1
+"""
+
+"""""""""
+toast = tmdb.People(92614).info()
+print (toast['popularity'])
+"""""""""
+
+''''''''''''''''
+recherche = tmdb.Movies(68726).info()
+print(recherche['original_language'])
+'''''''''''''''

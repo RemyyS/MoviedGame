@@ -4,15 +4,13 @@ import requests
 import json
 import pprint
 import random
+import APIHEADERS
 
-tmdb.API_KEY = '5046bd40ead6143ad0243a87775b1ff1'
+tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
 tmdb.REQUESTS_SESSION = requests.Session()
 
-headers = {
-    "accept": "application/json",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1MDQ2YmQ0MGVhZDYxNDNhZDAyNDNhODc3NzViMWZmMSIsIm5iZiI6MTczMTY0MzgwOS43MDIyNTA3LCJzdWIiOiI2NzM2YzNmNzcxZWY2Njk3OGNmYWZiNGMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.XjqyInYwlKE8VzRX_SWART2QtHU09gDfgzx7jfaPkKs"
-}
+headers = APIHEADERS.HEADERS
 
 def Returns_First_Key_In_Dictionnary(Dictionnaros: dict[str, str]) -> str:  
     for x in Dictionnaros.items():
@@ -72,58 +70,27 @@ def Input_Name_Query_Returns_Actor_Dictionary_Sorted_By_Popularity(NameQuery: st
     tentative2 = Sort_Actor_Dictionary_Returns_Most_Popular(tentative)
     return tentative2
 
-    
-    
-''''''''''
-    tentativesorted = Sort_A_Dictionnary_By_Popularity_In_Value_Key(tentative)
-    
-    
-    for x in tentativesorted.items():
-        mnopqrst = True
-        while mnopqrst == True:
-            
-            
-            aretourner = (x[0]) 
-            mnopqrst = False
-    
-            return aretourner
-        break        
-    
-'''''''''''  
-        
-
 def OrganiserLeDico(Dico):
-    for x in Dico.items():
-        print (x)
+    for x in Dico:
+        print (f"{x} : {Dico[x]}")
 
-
-
+def GetReleaseYearOfMovie(MovieName: str) -> str:
+    annee = ""
+    search = tmdb.Search()
+    response = search.movie(query=f"{MovieName}")
+    for j in search.results:
+        annee = (j['release_date'])
+        break
+    return annee[0:4]
 
 def JeuCompletFilm(NameOfActor: str) -> dict[str, str]:
-    Allez = Finding_Person_ID(NameOfActor)
-    Fiou = Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(Allez)
-    print (Fiou)
+    Allez = {}
+    Allez = Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(Finding_Person_ID(Input_Name_Query_Returns_Actor_Dictionary_Sorted_By_Popularity(NameOfActor)))
+    return Allez
 
 
 
 
-
-
-
-"""
-rangemovienumber = 100
-NumberToStartMovieList = 0
-response = tmdb.People(103).movie_credits()
-DictionnaireDeFilmASort = {}
-try:
-    for t in range(rangemovienumber):
-        
-        print (response['cast'][NumberToStartMovieList]['title'], ":", response['cast'][NumberToStartMovieList]['popularity'])
-        DictionnaireDeFilmASort[response['cast'][NumberToStartMovieList]['title']] = response['cast'][NumberToStartMovieList]['popularity']
-        NumberToStartMovieList +=1
-except IndexError: #Trigger si "rangemovienumber" dépasse l'index du nombre de film (s'il y a + d'index que de films dans lequel l'acteur a joué)
-    print (f"The actor has played in {NumberToStartMovieList -1} movies in his career")
-"""
 
 
 

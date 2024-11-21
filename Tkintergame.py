@@ -42,8 +42,9 @@ for key in Flopping.keys():
             print(f"Non, ce n'est pas {recherche['results'][0]['name']}")
     except IndexError:
         print('No results for this name, try again')
+        loop +=1
         continue
-    if str(loop) == len(Flopping-1):
+    if str(loop) == len(Flopping) -1:
         print("fin du jeu")
         sys.exit()
     

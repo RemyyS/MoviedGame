@@ -39,7 +39,7 @@ def Sort_Actor_Dictionary_Returns_Most_Popular(Dictionnaire: dict[str, str]) -> 
 
 def Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(ActorID: str) -> dict[str, str]: 
     #Sorted by popularity ASCENDING !!
-    rangemovienumber = 100
+    rangemovienumber = 50
     NumberToStartMovieList = 0
     response = tmdb.People(ActorID).movie_credits()
     DictionnaireDeFilmASort = {}
@@ -84,7 +84,11 @@ def GetReleaseYearOfMovie(MovieName: str) -> str:
     for j in search.results:
         annee = (j['release_date'])
         break
-    return annee[0:4]
+    
+    if len(annee[0:4]) == 4:
+        return "No data on release date"
+    else:
+        return annee[0:4]
 
 
 
@@ -122,14 +126,6 @@ def JeuCompletFilm() -> dict[str, str]:
     Allez = Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(Finding_Person_ID(Input_Name_Query_Returns_Actor_Dictionary_Sorted_By_Popularity(str(random.choice(list(GetPopular().keys()))))))
     return Allez
 
-
-
-#Gameloop = True
-#while Gameloop:
-    IndexFilmAGuess = 0
-    print (Flopping[IndexFilmAGuess])
-    
-    PlayerGuess = pyip.inputStr("Enter name of the actor that played in all of those movies")
 
 
 """

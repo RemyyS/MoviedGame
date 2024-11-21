@@ -21,6 +21,8 @@ def Finding_Person_ID(NameOfPerson: str) -> str:
     recherche = tmdb.Search()
     reponse = recherche.person(query=f"{NameOfPerson}")
     for j in recherche.results:
+        global NameToGuess #Delete this line when full game is out, used for finding the asnwer.
+        NameToGuess = j['name'] #Delete this line when full game is out, used for finding the asnwer.
         return j['id']
     
 def Sort_A_Dictionnary_By_Popularity_In_Value_Key(Dictionnaire: dict[str, str]) -> dict[str, str]: #Nom à rallonge, je sais
@@ -35,7 +37,8 @@ def Sort_Actor_Dictionary_Returns_Most_Popular(Dictionnaire: dict[str, str]) -> 
             klmnop = False
             return NameOfPersonMostPopular
 
-def Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(ActorID: str) -> dict[str, str]:
+def Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(ActorID: str) -> dict[str, str]: 
+    #Sorted by popularity ASCENDING !!
     rangemovienumber = 100
     NumberToStartMovieList = 0
     response = tmdb.People(ActorID).movie_credits()
@@ -49,7 +52,7 @@ def Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(ActorID: st
         pass
         #print (f"The actor has played in {NumberToStartMovieList -1} movies in his entire career, end of the list")
     
-    DictionnaireDeFilmSorted = Sort_A_Dictionnary_By_Popularity_In_Value_Key(DictionnaireDeFilmASort)
+    DictionnaireDeFilmSorted = dict(sorted(DictionnaireDeFilmASort.items(), key=lambda item: item[1], reverse=False)) #Sort by popularity ASCENDING, key[0] is the LEAST popular movie
     return DictionnaireDeFilmSorted
 
 
@@ -83,15 +86,50 @@ def GetReleaseYearOfMovie(MovieName: str) -> str:
         break
     return annee[0:4]
 
-def JeuCompletFilm(NameOfActor: str) -> dict[str, str]:
+
+
+def GetPopular(numeropagededepart: int = 1, numeropagedefin: int = 15)-> dict[str, str]:
+    '''
+    Returns dictionnary of actors in the "most popular" tab,
+    from page 1 to 15 by default.
+    The dictionnary includes their 'names' as keys, and original langage of their most popular movie as 'values'
+    Does not add any actor to the return dictionary that doesn't have a 'en' (english as primary spoken language) movie as their most popular movie.
+    (Because the most popular list is filled with unknown actors that are extremely niche in certain counrties)
+    '''
+    
+    finito3 ={}
+    while numeropagededepart < numeropagedefin:
+        url = f"https://api.themoviedb.org/3/person/popular?language=en&page={numeropagededepart}"
+
+        finito = requests.get(url, headers=headers)
+        finito2 = json.loads(finito.text)
+        
+        number = 0
+        for x in finito2['results']:
+            if finito2['results'][number]['known_for'][0]['original_language'] != 'en':
+                #print(f"{finito2['results'][number]['name']} is not english but {finito2['results'][number]['known_for'][0]['original_language']}")
+                number +=1
+            else:
+                finito3[finito2['results'][number]['name']] = finito2['results'][number]['known_for'][0]['original_language']
+                number +=1
+        numeropagededepart +=1
+        
+    return finito3
+
+
+def JeuCompletFilm() -> dict[str, str]:
     Allez = {}
-    Allez = Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(Finding_Person_ID(Input_Name_Query_Returns_Actor_Dictionary_Sorted_By_Popularity(NameOfActor)))
+    Allez = Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(Finding_Person_ID(Input_Name_Query_Returns_Actor_Dictionary_Sorted_By_Popularity(str(random.choice(list(GetPopular().keys()))))))
     return Allez
 
 
 
-
-
+#Gameloop = True
+#while Gameloop:
+    IndexFilmAGuess = 0
+    print (Flopping[IndexFilmAGuess])
+    
+    PlayerGuess = pyip.inputStr("Enter name of the actor that played in all of those movies")
 
 
 """
@@ -103,12 +141,8 @@ for c in response['results']:
     increasingnumber +=1
 """
 
-"""""""""
-toast = tmdb.People(92614).info()
-print (toast['popularity'])
-"""""""""
 
 ''''''''''''''''
-recherche = tmdb.Movies(68726).info()
-print(recherche['original_language'])
+recherche = tmdb.Person(68726).info()
+print(recherche['name'])
 '''''''''''''''

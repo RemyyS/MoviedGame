@@ -6,7 +6,8 @@ import pprint
 import random
 import Testing
 import APIHEADERS
-
+import pyinputplus as pyip
+import sys
 tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
 tmdb.REQUESTS_SESSION = requests.Session()
@@ -16,35 +17,35 @@ headers = APIHEADERS.HEADERS
 #Testing.OrganiserLeDico(Testing.JeuCompletFilm("Pitt"))
 
 
-"""
-def DeleteActorIfOriginalLanguageNotUS(ActorID):
-"""
-def GetPopular(nbpage):
-    while nbpage < 10:
-        finito3 = {}
-        url = f"https://api.themoviedb.org/3/person/popular?language=en&page={nbpage}"
+Flopping = (Testing.JeuCompletFilm())
 
-        finito = requests.get(url, headers=headers)
-        finito2 = json.loads(finito.text)
-        nbpage +=1
-        finito3.update([finito2])
-    return finito3
+print(Testing.NameToGuess) #str
+print(Flopping)
 
-#print (finito2)
-def inputpopulardico(finito3: dict):
-    num = 0
-    for x in finito3['results']:
-        print (finito3['results'][num]['name'])
-        num +=1
-
-inputpopulardico(GetPopular(5))
-"""
-def Check_If_Movie_Is_English(jsonloadiguess: dict):
-    num = 3
+loop = 0
+keyloop = 5 #Démarre le jeu au 5ème (6ème en vrai) key du dictionnaire des films (les 5 moins populaires sont généralement trop niches)
+#transformer en liste pouyr mieux itérer lmes loops je suppose
+for key in Flopping.keys():
     
-    if jsonloadiguess['results'][0]['known_for'][0]['original_language'] == 'en':
-        print (jsonloadiguess['results'][0]['known_for'][0]['title'])
-    num += 1
-
-Check_If_Movie_Is_English(finito2)
-"""
+    
+    
+    Skipunfilmtoutlesfilms = 0
+    print(f'{key}, released in : {Testing.GetReleaseYearOfMovie(key)}')
+    
+    PlayerGuess = pyip.inputStr("Enter name of the actor that played in all of those movies : >")
+    recherche = tmdb.Search().person(query=f'{PlayerGuess}')
+    try:
+        if recherche['results'][0]['name'] == Testing.NameToGuess:
+            print(f'Bien joue la team')
+            sys.exit()
+        else:
+            print(f"Non, ce n'est pas {recherche['results'][0]['name']}")
+    except IndexError:
+        print('No results for this name, try again')
+        continue
+    if str(loop) == len(Flopping-1):
+        print("fin du jeu")
+        sys.exit()
+    
+    loop +=1
+    keyloop +=2

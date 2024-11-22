@@ -8,45 +8,53 @@ import Testing
 import APIHEADERS
 import pyinputplus as pyip
 import sys
+
 tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
 tmdb.REQUESTS_SESSION = requests.Session()
-
 headers = APIHEADERS.HEADERS
 
-#Testing.OrganiserLeDico(Testing.JeuCompletFilm("Pitt"))
+#toastingos = Testing.JeuCompletFilm() #Working game on terminal
+#Testing.Working_Game(toastingos) #Working game on terminal
+def EntreeJoueur():
+    Toast = input.get()
+    toast = tmdb.Search().person(query=f'{Toast}')
+    print (toast['results'][0]['name'])
+
+boutonclique = 0
+def SkipClicked():
+    global boutonclique
+    boutonclique +=1
+    print(boutonclique)
+    
+
+window = Tk()
+window.title("Movied game")
+window.minsize(width = 800, height = 800)
+
+nom_du_film = Label(text = Testing.Functest())
+nom_du_film.pack()
+
+BoutonEntree = Button(text = "Entree", command=EntreeJoueur)
+BoutonEntree.pack(side='bottom')
+BoutonSkip = Button(text = "skippos", command=SkipClicked)
+BoutonSkip.pack(side= 'bottom')
+
+input = Entry()
+input.pack(side = 'bottom')
 
 
-Flopping = (Testing.JeuCompletFilm())
 
-print(Testing.NameToGuess) #str
-print(Flopping)
 
-loop = 0
-keyloop = 5 #Démarre le jeu au 5ème (6ème en vrai) key du dictionnaire des films (les 5 moins populaires sont généralement trop niches)
-#transformer en liste pouyr mieux itérer lmes loops je suppose
-for key in Flopping.keys():
-    
-    
-    
-    Skipunfilmtoutlesfilms = 0
-    print(f'{key}, released in : {Testing.GetReleaseYearOfMovie(key)}')
-    
-    PlayerGuess = pyip.inputStr("Enter name of the actor that played in all of those movies : >")
-    recherche = tmdb.Search().person(query=f'{PlayerGuess}')
-    try:
-        if recherche['results'][0]['name'] == Testing.NameToGuess:
-            print(f'Bien joue la team')
-            sys.exit()
-        else:
-            print(f"Non, ce n'est pas {recherche['results'][0]['name']}")
-    except IndexError:
-        print('No results for this name, try again')
-        loop +=1
-        continue
-    if str(loop) == len(Flopping) -1:
-        print("fin du jeu")
-        sys.exit()
-    
-    loop +=1
-    keyloop +=2
+
+
+
+
+
+
+
+
+
+
+
+window.mainloop()

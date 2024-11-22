@@ -5,6 +5,8 @@ import json
 import pprint
 import random
 import APIHEADERS
+import pyinputplus as pyip
+import sys
 
 tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
@@ -12,24 +14,25 @@ tmdb.REQUESTS_SESSION = requests.Session()
 
 headers = APIHEADERS.HEADERS
 
-def Returns_First_Key_In_Dictionnary(Dictionnaros: dict[str, str]) -> str:  
+def FirstKeyInDict(Dictionnaros: dict[str, str]) -> str:  
     for x in Dictionnaros.items():
-        aretourner = (x[0])
-        return aretourner
+        Toreturn = (x[0])
+        return Toreturn
 
-def Finding_Person_ID(NameOfPerson: str) -> str:
+def FindPersonID(NameOfPerson: str) -> str:
     recherche = tmdb.Search()
     reponse = recherche.person(query=f"{NameOfPerson}")
     for j in recherche.results:
-        global NameToGuess #Delete this line when full game is out, used for finding the asnwer.
-        NameToGuess = j['name'] #Delete this line when full game is out, used for finding the asnwer.
+        global NameToGuess
+        NameToGuess = (j['name'])
+        print (j['name']) #Delete this line when full game is out, used for finding the answer.
         return j['id']
     
-def Sort_A_Dictionnary_By_Popularity_In_Value_Key(Dictionnaire: dict[str, str]) -> dict[str, str]: #Nom à rallonge, je sais
+def DictSortedByPopularityInValue(Dictionnaire: dict[str, str]) -> dict[str, str]: #Nom à rallonge, je sais
     return dict(sorted(Dictionnaire.items(), key=lambda item: item[1], reverse=True))
 
-def Sort_Actor_Dictionary_Returns_Most_Popular(Dictionnaire: dict[str, str]) -> str:
-    Gribouille = Sort_A_Dictionnary_By_Popularity_In_Value_Key(Dictionnaire)
+def MostPopularActorDict(Dictionnaire: dict[str, str]) -> str:
+    Gribouille = DictSortedByPopularityInValue(Dictionnaire)
     for x in Gribouille.items():
         klmnop = True
         while klmnop == True:
@@ -37,7 +40,7 @@ def Sort_Actor_Dictionary_Returns_Most_Popular(Dictionnaire: dict[str, str]) -> 
             klmnop = False
             return NameOfPersonMostPopular
 
-def Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(ActorID: str) -> dict[str, str]: 
+def DictMoviesOfActorID(ActorID: str) -> dict[str, str]: 
     #Sorted by popularity ASCENDING !!
     rangemovienumber = 50
     NumberToStartMovieList = 0
@@ -56,22 +59,22 @@ def Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(ActorID: st
     return DictionnaireDeFilmSorted
 
 
-tentative = {}
+Actordict = {}
 NbPage = 1
-def Input_Name_Query_Returns_Actor_Dictionary_Sorted_By_Popularity(NameQuery: str) -> str: 
+def NameQueryInputActorDictPopularitySorted(NameQuery: str) -> str: 
     #Cursed function, do not modify
     global NbPage
     search = tmdb.Search()
     response = search.person(query=f"{NameQuery}", page = NbPage)
     
     for s in search.results:
-        tentative[s['name']] = s['popularity']
+        Actordict[s['name']] = s['popularity']
     while NbPage < 10:
         NbPage += 1
-        Input_Name_Query_Returns_Actor_Dictionary_Sorted_By_Popularity(NameQuery)
+        NameQueryInputActorDictPopularitySorted(NameQuery)
     
-    tentative2 = Sort_Actor_Dictionary_Returns_Most_Popular(tentative)
-    return tentative2
+    Actordict2 = MostPopularActorDict(Actordict)
+    return Actordict2
 
 def OrganiserLeDico(Dico):
     for x in Dico:
@@ -83,16 +86,16 @@ def GetReleaseYearOfMovie(MovieName: str) -> str:
     response = search.movie(query=f"{MovieName}")
     for j in search.results:
         annee = (j['release_date'])
+        if len(annee) == 0:
+            return "No data on release date"
         break
     
-    if len(annee[0:4]) == 4:
-        return "No data on release date"
-    else:
-        return annee[0:4]
+    
+    return annee[0:4]
 
 
 
-def GetPopular(numeropagededepart: int = 1, numeropagedefin: int = 15)-> dict[str, str]:
+def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
     '''
     Returns dictionnary of actors in the "most popular" tab,
     from page 1 to 15 by default.
@@ -101,9 +104,9 @@ def GetPopular(numeropagededepart: int = 1, numeropagedefin: int = 15)-> dict[st
     (Because the most popular list is filled with unknown actors that are extremely niche in certain counrties)
     '''
     
-    finito3 ={}
-    while numeropagededepart < numeropagedefin:
-        url = f"https://api.themoviedb.org/3/person/popular?language=en&page={numeropagededepart}"
+    DictReturn ={}
+    while Startpage < Endpage:
+        url = f"https://api.themoviedb.org/3/person/popular?language=en&page={Startpage}"
 
         finito = requests.get(url, headers=headers)
         finito2 = json.loads(finito.text)
@@ -114,19 +117,43 @@ def GetPopular(numeropagededepart: int = 1, numeropagedefin: int = 15)-> dict[st
                 #print(f"{finito2['results'][number]['name']} is not english but {finito2['results'][number]['known_for'][0]['original_language']}")
                 number +=1
             else:
-                finito3[finito2['results'][number]['name']] = finito2['results'][number]['known_for'][0]['original_language']
+                DictReturn[finito2['results'][number]['name']] = finito2['results'][number]['known_for'][0]['original_language']
                 number +=1
-        numeropagededepart +=1
+        Startpage +=1
         
-    return finito3
+    return DictReturn
 
 
 def JeuCompletFilm() -> dict[str, str]:
-    Allez = {}
-    Allez = Returns_Dictionary_Of_Movies_Sorted_By_Popularity_Of_An_Actor_ID(Finding_Person_ID(Input_Name_Query_Returns_Actor_Dictionary_Sorted_By_Popularity(str(random.choice(list(GetPopular().keys()))))))
+    
+    Allez = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(random.choice(list(GetPopular().keys()))))))
     return Allez
 
 
+def Working_Game(DicoComplet: dict[str, str], loop: int = 0):
+    
+    for key in DicoComplet.keys():    
+        print(f'{key}, released in : {GetReleaseYearOfMovie(key)}')
+        
+        PlayerGuess = pyip.inputStr("Enter name of the actor that played in all of those movies : >")
+        recherche = tmdb.Search().person(query=f'{PlayerGuess}')
+        try:
+            if recherche['results'][0]['name'] == NameToGuess:
+                print(f'Bien joue la team')
+                sys.exit()
+            
+            else:
+                print(f"Non, ce n'est pas {recherche['results'][0]['name']}")
+        except IndexError:
+            print('No results for this name, try again')
+            loop +=1
+            continue
+
+        if (loop) == len(DicoComplet)-1:
+            print("fin du jeu")
+            
+            sys.exit()
+        loop +=1
 
 """
 #Peut être utile
@@ -138,7 +165,10 @@ for c in response['results']:
 """
 
 
-''''''''''''''''
-recherche = tmdb.Person(68726).info()
-print(recherche['name'])
-'''''''''''''''
+def Functest():
+    yahi = tmdb.Movies(68726).info()
+    return yahi['title']
+
+def Tkinterfunctestgetfirstkeyindict(PlayerGuess):
+    toast = tmdb.Search().person(query=f'{PlayerGuess}')
+    print (toast['result'](0)['name'])

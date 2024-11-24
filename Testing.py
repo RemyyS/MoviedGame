@@ -40,11 +40,15 @@ def MostPopularActorDict(Dictionnaire: dict[str, str]) -> str:
         NameOfPersonMostPopular = (x[0])
         return NameOfPersonMostPopular
 
+def RequestForDictMoviesActorID(string: str):
+    response = tmdb.People(string).movie_credits()
+    return response
+
 def DictMoviesOfActorID(ActorID: str) -> dict[str, str]: 
     #Sorted by popularity ASCENDING !!
     rangemovienumber = 80
     NumberToStartMovieList = 0
-    response = tmdb.People(ActorID).movie_credits()
+    response = RequestForDictMoviesActorID(ActorID)
     DictionnaireDeFilmASort = {}
     DictionnaireDeFilmSorted = {}
     try:
@@ -56,7 +60,9 @@ def DictMoviesOfActorID(ActorID: str) -> dict[str, str]:
         #print (f"The actor has played in {NumberToStartMovieList -1} movies in his entire career, end of the list")
     
     DictionnaireDeFilmSorted = dict(sorted(DictionnaireDeFilmASort.items(), key=lambda item: item[1], reverse=False)) #Sort by popularity ASCENDING, key[0] is the LEAST popular movie
-    return DictionnaireDeFilmSorted
+    DicoCopiedToReturn = copy.deepcopy(DictionnaireDeFilmSorted)
+    DictionnaireDeFilmSorted.clear()
+    return DicoCopiedToReturn
 
 NbPage = 1
 
@@ -148,23 +154,28 @@ def JeuCompletFilm() -> dict[str, str]:
     
     Debugging = random.choice(ListPopularPeople)
     print (f"Après Debugging : {Debugging}")
-    
+    DictFinal = {}
     DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(Debugging))))
     
     Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 8} #Minimum popularity of each movie to be in the list
     
-    if len(Dico2) < 15: #Number of movies the actor needs to be in to be in the list
+    
+    if len(Dico2) < 20: #Number of movies the actor needs to be in to be in the list
         print ("Hit")
         DictFinal.clear()
         Dico2.clear()
-        JeuCompletFilm()
+        return JeuCompletFilm()
         
     else:
+        print ("aaaaaaaaaa")
+        print(f"JeuCompletFilm, Dico2 envoyé par la fonction : {Dico2}")
         return Dico2
 
-def ReduceDictToListOfTen(Dict, SizeOfList:int = 10, NumberOfTopMovies:int = 3) -> list:
+def ReduceDictToListOfTen(Dict: dict[str, str], SizeOfList:int = 10, NumberOfTopMovies:int = 3) -> list:
     '''Reduce Dictionnary to a List of (SizeOfList, 10 by default)
     appended by the top 3 movies of an actor by default (NumberOfTopMovies), by order ascending, no duplicates'''
+    
+    #print(f"message de reducedicttolistoften, Dict recu en argument : {Dict}")
     ListDictComplet = list(Dict)
     ListDictMinusThree = [] #Three in variable name by default, but any size put in NumberOfTopMovies
     for x in ListDictComplet:
@@ -182,13 +193,18 @@ def ReduceDictToListOfTen(Dict, SizeOfList:int = 10, NumberOfTopMovies:int = 3) 
     for x in FinalListAppend:
         FilmReturn.append(x) #Appends the top 3 (or any number in NumberOfTopMovies) movies of the actor to the list of movies
     
+    #ListDictMinusThree.clear()
+    #ListDictComplet.clear()
+    #Dict.clear()
+    
     return FilmReturn
 
 def Working_Game(loop: int = 0):
-    DicoComplet = JeuCompletFilm()
-    print (DicoComplet)
-    DicoListe = ReduceDictToListOfTen(DicoComplet)
-    print (DicoListe)
+    Dico2 = {}
+    Dico2 = JeuCompletFilm()
+    print(f"Message de Working_game Dico reçu: {Dico2}")
+    DicoListe = ReduceDictToListOfTen(Dico2)
+    
     for key in DicoListe:    
         print(f'{key}, released in : {GetReleaseYearOfMovie(key)}')
         
@@ -249,4 +265,3 @@ def GetPopularityOfMovie(MovieName: str) -> str:
 
 
 
-Working_Game()

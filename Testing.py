@@ -8,6 +8,7 @@ import APIHEADERS
 import pyinputplus as pyip
 import sys
 import testing3
+import copy
 
 tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
@@ -26,7 +27,8 @@ def FindPersonID(NameOfPerson: str) -> str:
     for j in recherche.results:
         global NameToGuess
         NameToGuess = (j['name'])
-        print (j['name']) #Delete this line when full game is out, used for finding the answer.
+        
+        print (f"résultat de fonction FindPersonID : {j['name']}") #Delete this line when full game is out, used for finding the answer.
         return j['id']
     
 def DictSortedByPopularityInValue(Dictionnaire: dict[str, str]) -> dict[str, str]: #Nom à rallonge, je sais
@@ -35,15 +37,12 @@ def DictSortedByPopularityInValue(Dictionnaire: dict[str, str]) -> dict[str, str
 def MostPopularActorDict(Dictionnaire: dict[str, str]) -> str:
     Gribouille = DictSortedByPopularityInValue(Dictionnaire)
     for x in Gribouille.items():
-        klmnop = True
-        while klmnop == True:
-            NameOfPersonMostPopular = (x[0])
-            klmnop = False
-            return NameOfPersonMostPopular
+        NameOfPersonMostPopular = (x[0])
+        return NameOfPersonMostPopular
 
 def DictMoviesOfActorID(ActorID: str) -> dict[str, str]: 
     #Sorted by popularity ASCENDING !!
-    rangemovienumber = 50
+    rangemovienumber = 80
     NumberToStartMovieList = 0
     response = tmdb.People(ActorID).movie_credits()
     DictionnaireDeFilmASort = {}
@@ -59,23 +58,35 @@ def DictMoviesOfActorID(ActorID: str) -> dict[str, str]:
     DictionnaireDeFilmSorted = dict(sorted(DictionnaireDeFilmASort.items(), key=lambda item: item[1], reverse=False)) #Sort by popularity ASCENDING, key[0] is the LEAST popular movie
     return DictionnaireDeFilmSorted
 
-
-Actordict = {}
 NbPage = 1
-def NameQueryInputActorDictPopularitySorted(NameQuery: str) -> str: 
-    #Cursed function, do not modify
-    global NbPage
+
+def RechercheActeurTroisPage(NameQuery: str, NbPage:int = 1): #Hard to explain, but necessary to not create a recursive mess
+    Actordict = {}
     search = tmdb.Search()
-    response = search.person(query=f"{NameQuery}", page = NbPage)
+    response = search.person(query=NameQuery, page = NbPage) 
     
-    for s in search.results:
-        Actordict[s['name']] = s['popularity']
-    while NbPage < 10:
+    while NbPage < 3:
+        for s in search.results:
+            Actordict[s['name']] = s['popularity']
         NbPage += 1
-        NameQueryInputActorDictPopularitySorted(NameQuery)
+        response = search.person(query=NameQuery, page = NbPage)
+    NbPage = 1
+    return Actordict
+
+
+
+
+
+def NameQueryInputActorDictPopularitySorted(NameQuery: str) -> str: 
     
-    Actordict2 = MostPopularActorDict(Actordict)
-    return Actordict2
+    print(f"Namequery dans la fonction a rallonge : {NameQuery}") #A DELETE
+    
+    ActorDict2 = RechercheActeurTroisPage(NameQuery)    
+    Actordict3 = MostPopularActorDict(ActorDict2)
+    
+    print(f"retour actor dict 3 : {Actordict3}")
+    return Actordict3
+    
 
 def OrganiserLeDico(Dico):
     for x in Dico:
@@ -129,42 +140,47 @@ def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
 
 
 
-def JeuCompletFilm() -> dict[str, str]:
-    ListPopularPeople = list(GetPopular().keys())
-    DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(random.choice(ListPopularPeople)))))
-    
-    Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 5}
-    
-    while len(Dico2) < 15:
-        print ("Hit")
-        DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(random.choice(ListPopularPeople)))))
-        Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 5}
-    
-    return Dico2
 
-def ReduceDictToListOfTen(Dict, SizeOfList:int = 10) -> list:
+ListPopularPeople = list(GetPopular().keys())
+def JeuCompletFilm() -> dict[str, str]:
+    
+    
+    
+    Debugging = random.choice(ListPopularPeople)
+    print (f"Après Debugging : {Debugging}")
+    
+    DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(Debugging))))
+    
+    Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 8} #Minimum popularity of each movie to be in the list
+    
+    if len(Dico2) < 15: #Number of movies the actor needs to be in to be in the list
+        print ("Hit")
+        DictFinal.clear()
+        Dico2.clear()
+        JeuCompletFilm()
+        
+    else:
+        return Dico2
+
+def ReduceDictToListOfTen(Dict, SizeOfList:int = 10, NumberOfTopMovies:int = 3) -> list:
     '''Reduce Dictionnary to a List of (SizeOfList, 10 by default)
-    appended by the top 3 movies of an actor, by order ascending, no duplicates'''
+    appended by the top 3 movies of an actor by default (NumberOfTopMovies), by order ascending, no duplicates'''
     ListDictComplet = list(Dict)
-    ListDictMinusThree = []
+    ListDictMinusThree = [] #Three in variable name by default, but any size put in NumberOfTopMovies
     for x in ListDictComplet:
         ListDictMinusThree.append(x)
+    for j in range(NumberOfTopMovies):
+        ListDictMinusThree.pop()
     
-    ListDictMinusThree.pop()
-    ListDictMinusThree.pop()
-    ListDictMinusThree.pop()
-
     number = 1
     FilmReturn = []
-    
     for x in range(SizeOfList):
         FilmReturn.append(ListDictMinusThree[round(len(ListDictMinusThree) / (SizeOfList/number))-1]) #Makes a list of 10 movies, located at the 1/10th, 2/10th, 3/10th etc... length of the movie list, the "10th" being the "SizeOfList" variable
         number +=1
-    FinalListAppend = ListDictComplet[:-4:-1]
+    FinalListAppend = ListDictComplet[:-abs(NumberOfTopMovies)-1:-1]
     FinalListAppend.reverse()
-    
     for x in FinalListAppend:
-        FilmReturn.append(x) #Appends the top 3 movies of the actor to the list of movies
+        FilmReturn.append(x) #Appends the top 3 (or any number in NumberOfTopMovies) movies of the actor to the list of movies
     
     return FilmReturn
 
@@ -230,5 +246,7 @@ def GetPopularityOfMovie(MovieName: str) -> str:
             return "No data on release date"
         break
     return annee
+
+
 
 Working_Game()

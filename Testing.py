@@ -7,6 +7,7 @@ import random
 import APIHEADERS
 import pyinputplus as pyip
 import sys
+import testing3
 
 tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
@@ -101,7 +102,7 @@ def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
     from page 1 to 15 by default.
     The dictionnary includes their 'names' as keys, and original langage of their most popular movie as 'values'
     Does not add any actor to the return dictionary that doesn't have a 'en' (english as primary spoken language) movie as their most popular movie.
-    (Because the most popular list is filled with unknown actors that are extremely niche in certain counrties)
+    (Because the most popular list is filled with unknown actors that are extremely niche to certain counrties)
     '''
     
     DictReturn ={}
@@ -116,6 +117,9 @@ def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
             if finito2['results'][number]['known_for'][0]['original_language'] != 'en':
                 #print(f"{finito2['results'][number]['name']} is not english but {finito2['results'][number]['known_for'][0]['original_language']}")
                 number +=1
+            elif finito2['results'][number]['known_for'][0]['popularity'] < 10 and finito2['results'][number]['known_for'][1]['popularity'] < 10 and finito2['results'][number]['known_for'][2]['popularity'] < 10:
+                #print(f"finito2['results'][number]['known_for'][0]['title'] has a popularity of finito2['results'][number]['known_for'][0]['popularity'], and every subsequent movie in the "known for" category is below 10 too")
+                number +=1
             else:
                 DictReturn[finito2['results'][number]['name']] = finito2['results'][number]['known_for'][0]['original_language']
                 number +=1
@@ -124,15 +128,52 @@ def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
     return DictReturn
 
 
+
 def JeuCompletFilm() -> dict[str, str]:
+    ListPopularPeople = list(GetPopular().keys())
+    DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(random.choice(ListPopularPeople)))))
     
-    Allez = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(random.choice(list(GetPopular().keys()))))))
-    return Allez
-
-
-def Working_Game(DicoComplet: dict[str, str], loop: int = 0):
+    Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 5}
     
-    for key in DicoComplet.keys():    
+    while len(Dico2) < 15:
+        print ("Hit")
+        DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(random.choice(ListPopularPeople)))))
+        Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 5}
+    
+    return Dico2
+
+def ReduceDictToListOfTen(Dict, SizeOfList:int = 10) -> list:
+    '''Reduce Dictionnary to a List of (SizeOfList, 10 by default)
+    appended by the top 3 movies of an actor, by order ascending, no duplicates'''
+    ListDictComplet = list(Dict)
+    ListDictMinusThree = []
+    for x in ListDictComplet:
+        ListDictMinusThree.append(x)
+    
+    ListDictMinusThree.pop()
+    ListDictMinusThree.pop()
+    ListDictMinusThree.pop()
+
+    number = 1
+    FilmReturn = []
+    
+    for x in range(SizeOfList):
+        FilmReturn.append(ListDictMinusThree[round(len(ListDictMinusThree) / (SizeOfList/number))-1]) #Makes a list of 10 movies, located at the 1/10th, 2/10th, 3/10th etc... length of the movie list, the "10th" being the "SizeOfList" variable
+        number +=1
+    FinalListAppend = ListDictComplet[:-4:-1]
+    FinalListAppend.reverse()
+    
+    for x in FinalListAppend:
+        FilmReturn.append(x) #Appends the top 3 movies of the actor to the list of movies
+    
+    return FilmReturn
+
+def Working_Game(loop: int = 0):
+    DicoComplet = JeuCompletFilm()
+    print (DicoComplet)
+    DicoListe = ReduceDictToListOfTen(DicoComplet)
+    print (DicoListe)
+    for key in DicoListe:    
         print(f'{key}, released in : {GetReleaseYearOfMovie(key)}')
         
         PlayerGuess = pyip.inputStr("Enter name of the actor that played in all of those movies : >")
@@ -149,11 +190,16 @@ def Working_Game(DicoComplet: dict[str, str], loop: int = 0):
             loop +=1
             continue
 
-        if (loop) == len(DicoComplet)-1:
+        if loop == len(DicoListe)-4:
+            print ("3 most popular movies :")        
+        
+        if (loop) == len(DicoListe)-1:
             print("fin du jeu")
             
             sys.exit()
         loop +=1
+
+
 
 """
 #Peut être utile
@@ -165,10 +211,24 @@ for c in response['results']:
 """
 
 
-def Functest():
+def Functest(): # a delete + tard
     yahi = tmdb.Movies(68726).info()
     return yahi['title']
 
-def Tkinterfunctestgetfirstkeyindict(PlayerGuess):
+def Tkinterfunctestgetfirstkeyindict(PlayerGuess): # a delete + tard
     toast = tmdb.Search().person(query=f'{PlayerGuess}')
     print (toast['result'](0)['name'])
+
+
+def GetPopularityOfMovie(MovieName: str) -> str:
+    annee = ""
+    search = tmdb.Search()
+    response = search.movie(query=f"{MovieName}")
+    for j in search.results:
+        annee = str((j['popularity']))
+        if len(annee) == 0:
+            return "No data on release date"
+        break
+    return annee
+
+Working_Game()

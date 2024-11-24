@@ -18,8 +18,11 @@ headers = APIHEADERS.HEADERS
 #Testing.Working_Game(toastingos) #Working game on terminal
 def EntreeJoueur():
     Toast = input.get()
-    toast = tmdb.Search().person(query=f'{Toast}')
-    print (toast['results'][0]['name'])
+    if Toast == "":
+        SkipClicked()
+    else:
+        toast = tmdb.Search().person(query=f'{Toast}')
+        print (toast['results'][0]['name'])
 
 boutonclique = 0
 def SkipClicked():

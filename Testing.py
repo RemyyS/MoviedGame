@@ -26,13 +26,16 @@ def FindPersonID(NameOfPerson: str) -> str:
     recherche = tmdb.Search()
     reponse = recherche.person(query=f"{NameOfPerson}")
     for j in recherche.results:
-        global NameToGuess
-        NameToGuess = (j['name']) #Where the answer gets taken from
-        global IDActor
-        IDActor = (j['id']) #Where the ID comes from for actor profile/picture
-        print (f"résultat de fonction FindPersonID : {j['name']}") #Delete this line when full game is out, used for finding the answer.
-        
-        return j['id']
+        try:
+            global NameToGuess
+            NameToGuess = (j['name']) #Where the answer gets taken from
+            global IDActor
+            IDActor = (j['id']) #Where the ID comes from for actor profile/picture
+            print (f"résultat de fonction FindPersonID : {j['name']}") #Delete this line when full game is out, used for finding the answer.
+            
+            return j['id']
+        except IndexError:
+            print ("Index error, name too long or unrecognized")
     
 def DictSortedByPopularityInValue(Dictionnaire: dict[str, str]) -> dict[str, str]: #Sorts a Dictionnary by their VALUES, not KEYS !!
     return dict(sorted(Dictionnaire.items(), key=lambda item: item[1], reverse=True))
@@ -266,11 +269,14 @@ def Functest(): # a delete + tard
 
 NumberOfGuess = 0
 #Dico2 = JeuCompletFilm()
-#Liste3 = ReduceDictToListOfTen(Dico2)
+
+Dico2 = testing3.DictTest
+Liste3 = ReduceDictToListOfTen(Dico2)
 def GetListItem(): 
     global NumberOfGuess
-    print (f"{Liste3[NumberOfGuess]} released in : {GetReleaseYearOfMovie(Liste3[NumberOfGuess])}")
+    MovieToGuess = (f"-{Liste3[NumberOfGuess]}, released in : {GetReleaseYearOfMovie(Liste3[NumberOfGuess])}")
     NumberOfGuess+=1
+    return MovieToGuess
 
 
 

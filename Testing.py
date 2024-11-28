@@ -16,7 +16,7 @@ tmdb.REQUESTS_TIMEOUT = (5, 10)
 tmdb.REQUESTS_SESSION = requests.Session()
 
 headers = APIHEADERS.HEADERS
-
+#NameToGuess = "Katheryn Winnick" #A DELETE
 def FirstKeyInDict(Dictionnaros: dict[str, str]) -> str:  
     for x in Dictionnaros.items():
         Toreturn = (x[0])
@@ -167,10 +167,10 @@ def JeuCompletFilm() -> dict[str, str]:
     DictFinal = {}
     DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(Debugging))))
     
-    Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 8} #Minimum popularity of each movie to be in the list, BEFORE the check of "len(dico2) < 20" is doen
+    Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 10} #Minimum popularity of each movie to be in the list, BEFORE the check of "len(dico2) < 20" is doen
     
     
-    if len(Dico2) < 20: #Number of movies the actor needs to be in to be in the list
+    if len(Dico2) < 15: #Number of movies the actor needs to be in to be in the list
         print ("Hit")
         DictFinal.clear()
         Dico2.clear()
@@ -270,12 +270,18 @@ def Functest(): # a delete + tard
 NumberOfGuess = 0
 #Dico2 = JeuCompletFilm()
 
-Dico2 = testing3.DictTest
-Liste3 = ReduceDictToListOfTen(Dico2)
+
+Liste3 = ReduceDictToListOfTen(JeuCompletFilm())
 def GetListItem(): 
     global NumberOfGuess
-    MovieToGuess = (f"-{Liste3[NumberOfGuess]}, released in : {GetReleaseYearOfMovie(Liste3[NumberOfGuess])}")
-    NumberOfGuess+=1
+    try: 
+        MovieToGuess = (f"-{Liste3[NumberOfGuess]}, released in : {GetReleaseYearOfMovie(Liste3[NumberOfGuess])}")
+        NumberOfGuess+=1
+    except IndexError:
+        print ("End of game !")
+
+        NumberOfGuess+=1
+        sys.exit()
     return MovieToGuess
 
 

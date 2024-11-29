@@ -16,7 +16,7 @@ tmdb.REQUESTS_TIMEOUT = (5, 10)
 tmdb.REQUESTS_SESSION = requests.Session()
 
 headers = APIHEADERS.HEADERS
-#NameToGuess = "Katheryn Winnick" #A DELETE
+NameToGuess = "Katheryn Winnick" #A DELETE
 def FirstKeyInDict(Dictionnaros: dict[str, str]) -> str:  
     for x in Dictionnaros.items():
         Toreturn = (x[0])
@@ -72,7 +72,7 @@ def DictMoviesOfActorID(ActorID: str) -> dict[str, str]:
 
 NbPage = 1
 
-def RechercheActeurTroisPage(NameQuery: str, NbPage:int = 1): #Hard to explain, but necessary to not create a recursive mess
+def RechercheActeurTroisPage(NameQuery: str, NbPage:int = 1): #Necessary to not create a recursive mess, relating tot he API call
     Actordict = {}
     search = tmdb.Search()
     response = search.person(query=NameQuery, page = NbPage) 
@@ -157,7 +157,7 @@ def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
 
 
 
-ListPopularPeople = list(GetPopular().keys())
+#ListPopularPeople = list(GetPopular().keys())
 def JeuCompletFilm() -> dict[str, str]:
     
     
@@ -181,8 +181,8 @@ def JeuCompletFilm() -> dict[str, str]:
         print(f"JeuCompletFilm, Dico2 envoyé par la fonction : {Dico2}") #debugging
         return Dico2
 
-def ReduceDictToListOfTen(Dict: dict[str, str], SizeOfList:int = 10, NumberOfTopMovies:int = 3) -> list:
-    '''Reduce Dictionnary to a List of (SizeOfList, 10 by default)
+def ReduceDictToListOfTen(Dict: dict[str, str], SizeOfList:int = 7, NumberOfTopMovies:int = 3) -> list:
+    '''Reduce Dictionnary to a List of (SizeOfList, 7 by default)
     appended by the top 3 movies of an actor by default (NumberOfTopMovies), by order ascending, no duplicates'''
     
     #print(f"message de reducedicttolistoften, Dict recu en argument : {Dict}") #debugging
@@ -196,7 +196,7 @@ def ReduceDictToListOfTen(Dict: dict[str, str], SizeOfList:int = 10, NumberOfTop
     number = 1
     FilmReturn = []
     for x in range(SizeOfList):
-        FilmReturn.append(ListDictMinusThree[round(len(ListDictMinusThree) / (SizeOfList/number))-1]) #Makes a list of 10 movies, located at the 1/10th, 2/10th, 3/10th etc... length of the movie list, the "10th" being the "SizeOfList" variable
+        FilmReturn.append(ListDictMinusThree[round(len(ListDictMinusThree) / (SizeOfList/number))-1]) #Makes a list of 10 movies, located at the 1/10th, 2/10th, 3/10th etc... length of the movie list, the "7th" being the "SizeOfList" variable
         number +=1
     FinalListAppend = ListDictComplet[:-abs(NumberOfTopMovies)-1:-1]
     FinalListAppend.reverse()
@@ -275,7 +275,7 @@ Liste3 = ReduceDictToListOfTen(testing3.DictTest)
 def GetListItem(): 
     global NumberOfGuess
     try: 
-        MovieToGuess = (f"-{Liste3[NumberOfGuess]}, released in : {GetReleaseYearOfMovie(Liste3[NumberOfGuess])}\n Genre : {GetGenreOfMovie(Liste3[NumberOfGuess])}")
+        MovieToGuess = (f"-{Liste3[NumberOfGuess]} ({GetReleaseYearOfMovie(Liste3[NumberOfGuess])})\n Genre : {GetGenreOfMovie(Liste3[NumberOfGuess])}")
         
         NumberOfGuess+=1
     except IndexError:
@@ -333,7 +333,4 @@ genreAPI = {28: 'Action',
             10752: 'War',
             37: 'Western'}
         
-
-print (GetGenreOfMovie('The Dark Tower'))
-
 

@@ -69,7 +69,7 @@ def SkipClicked():
     print(boutonclique)
     
 def create_text_label(display_text:str, x:int, y:int):
-    textrecursive = Label(window, text=display_text, font=('Arial', 10, 'bold'), justify='center')
+    textrecursive = Label(window, text=display_text, font=('Arial', 10), justify='center')
     textrecursive.pack(side=TOP)
     create_blank_label()
     #text.place(y = y,x = x)
@@ -85,15 +85,15 @@ style.configure('TButton', font =('calibri', 15, 'bold'))
 window.title("Movied")
 window.minsize(width = 600, height = 650)
 
-window.config(padx = 10, pady = 10)
+window.config(padx = 0, pady = 3)
 #style.theme_use('clam')
 
-Notice = Label(text = "Find the actor", font= ("Helvetica", 15, "bold"), justify=CENTER, anchor=S)
+Notice = Label(text = "Find the actor", font= ("courier", 25, "bold"), justify=CENTER, anchor=S)
 Notice.pack()
-Notice2 = Label(text = "Based on the movies they were in, popularity ascending", font= ("Helvetica", 9, "bold"), justify=CENTER, anchor=N)
+Notice2 = Label(text = "Based on the movies they were in, popularity ascending", font= ("courier", 12), justify=CENTER, anchor=N)
 Notice2.pack()
 CMDoutput = Label(text= "test", font= ("Helvetica", 12, "bold"))
-CMDoutput.place(x = 5, y = 325)
+
 
 
 
@@ -111,12 +111,12 @@ input.bind("<FocusIn>", temp_text)
 
 
 
-
+create_blank_label()
 create_text_label(display_text=Testing.GetListItem(), x=xcoordinates, y=ycoordinates)
 
 
 
 
-
+CMDoutput.pack(side='bottom')
 
 window.mainloop()

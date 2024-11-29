@@ -268,14 +268,15 @@ def Functest(): # a delete + tard
 
 
 NumberOfGuess = 0
-#Dico2 = JeuCompletFilm()
 
 
-Liste3 = ReduceDictToListOfTen(JeuCompletFilm())
+
+Liste3 = ReduceDictToListOfTen(testing3.DictTest)
 def GetListItem(): 
     global NumberOfGuess
     try: 
-        MovieToGuess = (f"-{Liste3[NumberOfGuess]}, released in : {GetReleaseYearOfMovie(Liste3[NumberOfGuess])}")
+        MovieToGuess = (f"-{Liste3[NumberOfGuess]}, released in : {GetReleaseYearOfMovie(Liste3[NumberOfGuess])}\n Genre : {GetGenreOfMovie(Liste3[NumberOfGuess])}")
+        
         NumberOfGuess+=1
     except IndexError:
         print ("End of game !")
@@ -299,5 +300,40 @@ def GetPopularityOfMovie(MovieName: str) -> str:
             return "No data on release date"
         break
     return annee
+
+def GetGenreOfMovie(MovieName: str) -> str:
+    genre = ""
+    search = tmdb.Search()
+    response = search.movie(query=f"{MovieName}")
+    testos = response['results'][0]['genre_ids']
+    listgenre = []
+    for x in testos:
+        listgenre.append(genreAPI[x])
+    
+    listgenre2 = ", ".join(listgenre)
+    return listgenre2
+
+genreAPI = {28: 'Action',
+            12: 'Adventure',
+            16: 'Animation',
+            35: 'Comedy',
+            80: 'Crime',
+            99: 'Documentary',
+            18: 'Drama',
+            10751: 'Family',
+            14: 'Fantasy',
+            36: 'History',
+            27: 'Horror',
+            10749: 'Romance',
+            9648: 'Mystery',
+            10402: 'Music',
+            878: 'Science Fiction',
+            10770: 'TV Movie',
+            53: 'Thriller',
+            10752: 'War',
+            37: 'Western'}
+        
+
+print (GetGenreOfMovie('The Dark Tower'))
 
 

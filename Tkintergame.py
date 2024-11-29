@@ -28,18 +28,18 @@ headers = APIHEADERS.HEADERS
 
 
 
-xcoordinates = 5
-ycoordinates = 20
+xcoordinates = 5 #used for deprecated .place method
+ycoordinates = 20 #used for deprecated .place method
 
 def EntreeJoueur():
-    global xcoordinates #Get coordinates to print new labels
-    global ycoordinates
-    ycoordinates += 18
+    global xcoordinates #Get coordinates to print new labels for the .place method
+    global ycoordinates #Get coordinates to print new labels for the .place method
+    ycoordinates += 18 #deprecated .place method to place movies appearing
     
     Toast = input.get()
     toast = tmdb.Search().person(query=f'{Toast}')
     
-    if Toast == "" or Toast == "Actor in common": #If user doesn't write anything
+    if Toast == "" or Toast == "Who is it ?": #If user doesn't write anything
         pass
     else:
         try: #Try method to solve if user writes gibberish non sense like "bufgefaznjonibfa"
@@ -47,8 +47,8 @@ def EntreeJoueur():
         except IndexError:            
             create_text_label(display_text=Testing.GetListItem(), x=xcoordinates, y=ycoordinates)
             CMDoutput.config(text=f"No name found linked to that input")
-    try: 
-        if Toast == "" or Toast == "Actor in common": #If the user didn't write anything :
+    try: #Catch the UnboundLocalError
+        if Toast == "" or Toast == "Who is it ?": #If the user didn't write anything :
             create_text_label(display_text=Testing.GetListItem(), x=xcoordinates, y=ycoordinates)
             CMDoutput.config(text=f"")
         elif UserAnswer != Testing.NameToGuess: #If the user got it wrong :
@@ -69,44 +69,50 @@ def SkipClicked():
     print(boutonclique)
     
 def create_text_label(display_text:str, x:int, y:int):
-    text = Label(window, text=display_text, font=('Arial', 10, 'bold'))
-    text.place(y = y,x = x)
+    textrecursive = Label(window, text=display_text, font=('Arial', 10, 'bold'), justify='center')
+    textrecursive.pack(side=TOP)
+    create_blank_label()
+    #text.place(y = y,x = x)
+def create_blank_label():
+    blank = Label(window, text = "")
+    blank.pack(side=TOP)
+
 
 window = Tk()
 style = Style()
 style.configure('TButton', font =('calibri', 15, 'bold'))
 
 window.title("Movied")
-window.minsize(width = 400, height = 400)
-window.resizable(False, False)
+window.minsize(width = 600, height = 650)
+
 window.config(padx = 10, pady = 10)
 #style.theme_use('clam')
 
-Notice = Label(text = "From least popular to most popular:", font= ("Helvetica", 12, "bold"), justify=CENTER)
+Notice = Label(text = "Find the actor", font= ("Helvetica", 15, "bold"), justify=CENTER, anchor=S)
 Notice.pack()
-#Notice2 = Label(text = "From least popular to most popular:", font= ("Helvetica", 9, "bold"), justify=CENTER)
-#Notice2.pack()
+Notice2 = Label(text = "Based on the movies they were in, popularity ascending", font= ("Helvetica", 9, "bold"), justify=CENTER, anchor=N)
+Notice2.pack()
 CMDoutput = Label(text= "test", font= ("Helvetica", 12, "bold"))
 CMDoutput.place(x = 5, y = 325)
 
 
 
 BoutonEntree = Button(window, text = "Enter", command=EntreeJoueur, width=8)
-BoutonEntree.place(x = 293, y = 350)
+BoutonEntree.pack(side=BOTTOM)
 
 def temp_text(e): #Used to make the inserted text at startup disappear when user clicks on text box
    input.delete(0,"end")
 
 input = Entry(width=20, font=('courier', 17, 'bold'), foreground='#808080')
-input.insert(0, "Actor in common")
-input.place(x = 0, y = 350)
+input.insert(0, "Who is it ?")
+input.pack(side=BOTTOM)
 input.bind("<FocusIn>", temp_text)
 
 
 
 
 
-
+create_text_label(display_text=Testing.GetListItem(), x=xcoordinates, y=ycoordinates)
 
 
 

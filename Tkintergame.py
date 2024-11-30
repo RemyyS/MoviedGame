@@ -12,6 +12,7 @@ import time
 from tkinter.ttk import *
 import webstream
 from PIL import ImageTk, Image
+import os
 
 tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
@@ -25,8 +26,22 @@ headers = APIHEADERS.HEADERS
 xcoordinates = 5 #used for deprecated .place method
 ycoordinates = 20 #used for deprecated .place method
 
+import sys
+import os
 
-def EntreeJoueur():
+def restart_program():
+    """Restarts the current program.
+    Note: this function does not return."""
+    python = sys.executable
+    os.execl(python, python, * sys.argv)
+""" 
+if __name__ == "__main__":
+    answer = raw_input("Do you want to restart this program ? ")
+    if answer.lower().strip() in "y yes".split():
+        restart_program() 
+"""
+
+def EntreeJoueur(e = 0): #e = 0 is used for event Return, for the user to be able to hit "Enter" on keyboard and it works as if they hit the tkinter button Enter(function input)
     
     global xcoordinates #Get coordinates to print new labels for the .place method
     global ycoordinates #Get coordinates to print new labels for the .place method
@@ -75,13 +90,13 @@ def SkipClicked():
     boutonclique +=1
     print(boutonclique)
     
-def create_text_label(display_text:str, x:int, y:int):
+def create_text_label(display_text:str, x:int, y:int): #X and Y args used for .place() method
     textrecursive = Label(window, text=display_text, font=('Arial', 10, 'bold'), justify='center')
     textrecursive.pack(side=TOP)
     
     #text.place(y = y,x = x)
 
-def create_genre_label(display_text:str, x:int, y:int):
+def create_genre_label(display_text:str, x:int, y:int): #X and Y args used for .place() method
     textgenre = Label(window, text=display_text, justify='center')
     textgenre.pack(side=TOP)
     create_blank_label()
@@ -134,6 +149,7 @@ input = Entry(width=20, font=('courier', 17, 'bold'), foreground='#808080')
 input.insert(0, "Who is it ?")
 input.pack(side=BOTTOM)
 input.bind("<FocusIn>", temp_text)
+input.bind("<Return>", EntreeJoueur) #Used to make the user hit "Enter" on keyboard to validate their input instead of clicking
 
 
 

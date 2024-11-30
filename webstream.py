@@ -4,6 +4,12 @@ import io
 from PIL import ImageTk, Image
 import Testing
 
+
+"""
+currently used to get the picture of the actor as the last hint
+streams the picture using API call
+"""
+
 """
 Can be used to put a background image
 Working but creates grey boxes around Labels, no solution exists

@@ -10,34 +10,35 @@ import pyinputplus as pyip
 import sys
 import time
 from tkinter.ttk import *
+import webstream
+from PIL import ImageTk, Image
 
 tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
 tmdb.REQUESTS_SESSION = requests.Session()
 headers = APIHEADERS.HEADERS
 
-# --url 'https://api.themoviedb.org/3/movie/550/images?language=en-US&include_image_language=en,null'
-# https://image.tmdb.org/t/p/original/c0HNhjChGybnHa4eoLyqO4dDu1j.jpg URL FOR PICTURES
-
-# images = tmdb.People(Testing.IDActor).images()
-#for image in images['profiles']:
-#    print(image)
 
 #toastingos = Testing.JeuCompletFilm() #Working game on terminal
 #Testing.Working_Game(toastingos) #Working game on terminal
 
-
-
 xcoordinates = 5 #used for deprecated .place method
 ycoordinates = 20 #used for deprecated .place method
 
+
 def EntreeJoueur():
+    
     global xcoordinates #Get coordinates to print new labels for the .place method
     global ycoordinates #Get coordinates to print new labels for the .place method
     ycoordinates += 18 #deprecated .place method to place movies appearing
     
+    if Testing.NumberOfGuess > len(Testing.Liste3): #Will trigger when list if exhausted, as a final hint
+        print('hit')
+        imagelab.pack(side=TOP)
+
     Toast = input.get()
     toast = tmdb.Search().person(query=f'{Toast}')
+    
     
     if Toast == "" or Toast == "Who is it ?": #If user doesn't write anything
         pass
@@ -46,14 +47,20 @@ def EntreeJoueur():
             UserAnswer = toast['results'][0]['name']
         except IndexError:            
             create_text_label(display_text=Testing.GetListItem(), x=xcoordinates, y=ycoordinates)
+            create_genre_label(display_text=Testing.GetGenreItem(), x=xcoordinates, y=ycoordinates)
+
             CMDoutput.config(text=f"No name found linked to that input")
     try: #Catch the UnboundLocalError
         if Toast == "" or Toast == "Who is it ?": #If the user didn't write anything :
             create_text_label(display_text=Testing.GetListItem(), x=xcoordinates, y=ycoordinates)
+            create_genre_label(display_text=Testing.GetGenreItem(), x=xcoordinates, y=ycoordinates)
+
             CMDoutput.config(text=f"")
         elif UserAnswer != Testing.NameToGuess: #If the user got it wrong :
             CMDoutput.config(text=f"No, this isn't {UserAnswer}")
             create_text_label(display_text=Testing.GetListItem(), x=xcoordinates, y=ycoordinates)
+            create_genre_label(display_text=Testing.GetGenreItem(), x=xcoordinates, y=ycoordinates)
+
         else:                            
             if UserAnswer == Testing.NameToGuess: #If the user got it right
                 CMDoutput.config(text=f"Congratulations ! It is {UserAnswer} !")
@@ -69,12 +76,18 @@ def SkipClicked():
     print(boutonclique)
     
 def create_text_label(display_text:str, x:int, y:int):
-    textrecursive = Label(window, text=display_text, font=('Arial', 10), justify='center')
+    textrecursive = Label(window, text=display_text, font=('Arial', 10, 'bold'), justify='center')
     textrecursive.pack(side=TOP)
-    create_blank_label()
+    
     #text.place(y = y,x = x)
+
+def create_genre_label(display_text:str, x:int, y:int):
+    textgenre = Label(window, text=display_text, justify='center')
+    textgenre.pack(side=TOP)
+    create_blank_label()
+
 def create_blank_label():
-    blank = Label(window, text = "")
+    blank = Label(window, text = "", background='#380000')
     blank.pack(side=TOP)
 
 
@@ -82,17 +95,31 @@ window = Tk()
 style = Style()
 style.configure('TButton', font =('calibri', 15, 'bold'))
 
-window.title("Movied")
-window.minsize(width = 600, height = 650)
 
-window.config(padx = 0, pady = 3)
+""" 
+image = Image.open('photo_cinema.jpg') #Used for background pictures, see webstream.py
+bg_image = ImageTk.PhotoImage(image) #Used for background pictures, see webstream.py
+CanvasTest = Canvas(window, width=bg_image.width(), height=bg_image.height()) #Used for background pictures, see webstream.py
+CanvasTest.place(x=0, y=0) #Used for background pictures, see webstream.py
+CanvasTest.create_image(0, 0, image=bg_image, anchor='nw') #Used for background pictures, see webstream.py
+"""
+
+window.title("Movied")
+window.minsize(width = 600, height = 850)
+window.configure(background='#380000')
+window.config(padx = 0, pady = 0)
 #style.theme_use('clam')
 
-Notice = Label(text = "Find the actor", font= ("courier", 25, "bold"), justify=CENTER, anchor=S)
+Notice = Label(text = "Find the actor", font= ("courier", 25, "bold"), justify=CENTER, anchor=S, borderwidth=0, relief="flat", compound=CENTER, width=0, background='#380000', foreground='white')
 Notice.pack()
-Notice2 = Label(text = "Based on the movies they were in, popularity ascending", font= ("courier", 12), justify=CENTER, anchor=N)
+Notice2 = Label(text = "Based on the movies they were in, popularity ascending", font= ("courier", 12, "underline"), justify=CENTER, anchor=N, borderwidth=0, relief="flat", width= 0, background='#380000', foreground='light grey')
 Notice2.pack()
-CMDoutput = Label(text= "test", font= ("Helvetica", 12, "bold"))
+CMDoutput = Label(text= "test", font= ("Helvetica", 12, "bold"), background='#380000')
+
+
+
+img = webstream.WebImage(webstream.link).get() 
+imagelab = Label(window, image=img) 
 
 
 
@@ -110,13 +137,12 @@ input.bind("<FocusIn>", temp_text)
 
 
 
-
+create_blank_label()
 create_blank_label()
 create_text_label(display_text=Testing.GetListItem(), x=xcoordinates, y=ycoordinates)
-
+create_genre_label(display_text=Testing.GetGenreItem(), x=xcoordinates, y=ycoordinates)
 
 
 
 CMDoutput.pack(side='bottom')
-
 window.mainloop()

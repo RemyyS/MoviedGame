@@ -16,7 +16,7 @@ tmdb.REQUESTS_TIMEOUT = (5, 10)
 tmdb.REQUESTS_SESSION = requests.Session()
 
 headers = APIHEADERS.HEADERS
-NameToGuess = "Katheryn Winnick" #A DELETE
+NameToGuess = ''
 def FirstKeyInDict(Dictionnaros: dict[str, str]) -> str:  
     for x in Dictionnaros.items():
         Toreturn = (x[0])
@@ -157,7 +157,7 @@ def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
 
 
 
-#ListPopularPeople = list(GetPopular().keys())
+ListPopularPeople = list(GetPopular().keys())
 def JeuCompletFilm() -> dict[str, str]:
     
     
@@ -167,7 +167,7 @@ def JeuCompletFilm() -> dict[str, str]:
     DictFinal = {}
     DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(Debugging))))
     
-    Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 10} #Minimum popularity of each movie to be in the list, BEFORE the check of "len(dico2) < 20" is doen
+    Dico2 = {k:DictFinal[k] for k in DictFinal if DictFinal[k] > 12} #Minimum popularity of each movie to be in the list, BEFORE the check of "len(dico2) < 20" is doen
     
     
     if len(Dico2) < 15: #Number of movies the actor needs to be in to be in the list
@@ -181,8 +181,8 @@ def JeuCompletFilm() -> dict[str, str]:
         print(f"JeuCompletFilm, Dico2 envoyé par la fonction : {Dico2}") #debugging
         return Dico2
 
-def ReduceDictToListOfTen(Dict: dict[str, str], SizeOfList:int = 7, NumberOfTopMovies:int = 3) -> list:
-    '''Reduce Dictionnary to a List of (SizeOfList, 7 by default)
+def ReduceDictToListOfTen(Dict: dict[str, str], SizeOfList:int = 5, NumberOfTopMovies:int = 3) -> list:
+    '''Reduce Dictionnary to a List of (SizeOfList, 5 by default)
     appended by the top 3 movies of an actor by default (NumberOfTopMovies), by order ascending, no duplicates'''
     
     #print(f"message de reducedicttolistoften, Dict recu en argument : {Dict}") #debugging
@@ -196,7 +196,7 @@ def ReduceDictToListOfTen(Dict: dict[str, str], SizeOfList:int = 7, NumberOfTopM
     number = 1
     FilmReturn = []
     for x in range(SizeOfList):
-        FilmReturn.append(ListDictMinusThree[round(len(ListDictMinusThree) / (SizeOfList/number))-1]) #Makes a list of 10 movies, located at the 1/10th, 2/10th, 3/10th etc... length of the movie list, the "7th" being the "SizeOfList" variable
+        FilmReturn.append(ListDictMinusThree[round(len(ListDictMinusThree) / (SizeOfList/number))-1]) #Makes a list of 10 movies, located at the 1/10th, 2/10th, 3/10th etc... length of the movie list, the "5th" being the "SizeOfList" variable
         number +=1
     FinalListAppend = ListDictComplet[:-abs(NumberOfTopMovies)-1:-1]
     FinalListAppend.reverse()
@@ -244,14 +244,7 @@ def Working_Game(loop: int = 0):
 
 
 
-"""
-#Peut être utile
-response = tmdb.Trending(media_type='movie', time_window='week').info()
-increasingnumber = 0
-for c in response['results']:
-    print (response['results'][increasingnumber]['title'])
-    increasingnumber +=1
-"""
+
 #response = tmdb.People(95101).info() #Gets the info from the FindActorID function
 #print (response)
 def GetActorInfoOnID():
@@ -262,32 +255,29 @@ def GetActorInfoOnID():
     
 
 
-def Functest(): # a delete + tard
-    PacificosRimos = tmdb.Movies(68726).info()
-    return PacificosRimos['title']
+
 
 
 NumberOfGuess = 0
-
-
-
-Liste3 = ReduceDictToListOfTen(testing3.DictTest)
+Liste3 = ReduceDictToListOfTen(JeuCompletFilm())
 def GetListItem(): 
     global NumberOfGuess
     try: 
-        MovieToGuess = (f"-{Liste3[NumberOfGuess]} ({GetReleaseYearOfMovie(Liste3[NumberOfGuess])})\n Genre : {GetGenreOfMovie(Liste3[NumberOfGuess])}")
-        
+        MovieToGuess = (f"{Liste3[NumberOfGuess]} ({GetReleaseYearOfMovie(Liste3[NumberOfGuess])})")        
         NumberOfGuess+=1
     except IndexError:
-        print ("End of game !")
-
+        print ("Hint before the end !")
         NumberOfGuess+=1
-        sys.exit()
     return MovieToGuess
 
-
-
-
+def GetGenreItem(): 
+    global NumberOfGuess
+    try: 
+        GenreGlobal = (f"Genre : {GetGenreOfMovie(Liste3[NumberOfGuess-1])}")
+    except IndexError:
+        pass
+    return GenreGlobal
+    
 
 
 def GetPopularityOfMovie(MovieName: str) -> str:
@@ -299,7 +289,7 @@ def GetPopularityOfMovie(MovieName: str) -> str:
         if len(annee) == 0:
             return "No data on release date"
         break
-    return annee
+    return annee #was cloned from the "get year of movie" function
 
 def GetGenreOfMovie(MovieName: str) -> str:
     genre = ""
@@ -334,3 +324,10 @@ genreAPI = {28: 'Action',
             37: 'Western'}
         
 
+
+def GetPictureOne(IDActor):
+    
+    images = tmdb.People(IDActor).images()
+    for image in images['profiles'][0]['file_path']:
+        return images['profiles'][0]['file_path']
+    

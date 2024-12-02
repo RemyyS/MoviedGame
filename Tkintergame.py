@@ -1,4 +1,5 @@
 from tkinter import * 
+from tkinter import messagebox
 import tmdbsimple as tmdb
 import requests
 import json
@@ -14,10 +15,10 @@ import webstream
 from PIL import ImageTk, Image
 import os
 
-tmdb.API_KEY = f'{APIHEADERS.API}'
+tmdb.API_KEY = webstream.APIFINAL
 tmdb.REQUESTS_TIMEOUT = (5, 10)
 tmdb.REQUESTS_SESSION = requests.Session()
-headers = APIHEADERS.HEADERS
+headers = webstream.HEADERS
 
 
 #toastingos = Testing.JeuCompletFilm() #Working game on terminal
@@ -47,10 +48,10 @@ def EntreeJoueur(e = 0): #e = 0 is used for event Return, for the user to be abl
     global ycoordinates #Get coordinates to print new labels for the .place method
     ycoordinates += 18 #deprecated .place method to place movies appearing
     
-    if Testing.NumberOfGuess > len(Testing.Liste3): #Will trigger when list if exhausted, as a final hint
-        print('hit')
+    if Testing.NumberOfGuess == len(Testing.Liste3): #Will trigger when list if exhausted, as a final hint
+        create_hint_label()
         imagelab.pack(side=TOP)
-
+    
     Toast = input.get()
     toast = tmdb.Search().person(query=f'{Toast}')
     
@@ -80,9 +81,17 @@ def EntreeJoueur(e = 0): #e = 0 is used for event Return, for the user to be abl
             if UserAnswer == Testing.NameToGuess: #If the user got it right
                 CMDoutput.config(text=f"Congratulations ! It is {UserAnswer} !")
                 
-                            
+        
+    
     except UnboundLocalError: #Try method to catch the previous IndexError for the previous block, writing in the previous IndexError except method to set the UserAnswer string to a default value is catastrophic in future damages
         pass
+    
+    if Testing.NumberOfGuess > len(Testing.Liste3)+1:
+            try_again = messagebox.askyesno(title="Try again ?",  message=f"The answer was {Testing.NameToGuess} ! \n Would you like to play again ?" )
+            if try_again:
+                restart_program()
+            else:
+                sys.exit()
 
 boutonclique = 0
 def SkipClicked():
@@ -105,6 +114,9 @@ def create_blank_label():
     blank = Label(window, text = "", background='#380000')
     blank.pack(side=TOP)
 
+def create_hint_label():
+    hint = Label(window, text = "Picture hint and last try !", background='light green')
+    hint.pack(side=TOP)
 
 window = Tk()
 style = Style()
@@ -127,9 +139,9 @@ window.config(padx = 0, pady = 0)
 
 Notice = Label(text = "Find the actor", font= ("courier", 25, "bold"), justify=CENTER, anchor=S, borderwidth=0, relief="flat", compound=CENTER, width=0, background='#380000', foreground='white')
 Notice.pack()
-Notice2 = Label(text = "Based on the movies they were in, popularity ascending", font= ("courier", 12, "underline"), justify=CENTER, anchor=N, borderwidth=0, relief="flat", width= 0, background='#380000', foreground='light grey')
+Notice2 = Label(text = "Based on the movies they were in, popularity ascending", font= ("courier", 12, "underline", "bold"), justify=CENTER, anchor=N, borderwidth=0, relief="flat", width= 0, background='#380000', foreground='light grey')
 Notice2.pack()
-CMDoutput = Label(text= "test", font= ("Helvetica", 12, "bold"), background='#380000')
+CMDoutput = Label(text= "test", font= ("Helvetica", 12, "bold"), background='light blue')
 
 
 

@@ -266,7 +266,7 @@ def GetListItem():
         MovieToGuess = (f"{Liste3[NumberOfGuess]} ({GetReleaseYearOfMovie(Liste3[NumberOfGuess])})")        
         NumberOfGuess+=1
     except IndexError:
-        print ("Hint before the end !")
+        print ("Hint before the end !") ###########################
         NumberOfGuess+=1
     return MovieToGuess
 

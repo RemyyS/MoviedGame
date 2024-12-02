@@ -2,7 +2,6 @@ from tkinter import *
 import tmdbsimple as tmdb
 import requests
 import json
-import pprint
 import random
 import APIHEADERS
 import pyinputplus as pyip
@@ -31,7 +30,7 @@ def FindPersonID(NameOfPerson: str) -> str:
             NameToGuess = (j['name']) #Where the answer gets taken from
             global IDActor
             IDActor = (j['id']) #Where the ID comes from for actor profile/picture
-            print (f"résultat de fonction FindPersonID : {j['name']}") #Delete this line when full game is out, used for finding the answer.
+            #print (f"résultat de fonction FindPersonID : {j['name']}") #Delete this line when full game is out, used for finding the answer.
             
             return j['id']
         except IndexError:
@@ -95,13 +94,8 @@ def NameQueryInputActorDictPopularitySorted(NameQuery: str) -> str:
     returns a dict of actors that matches the query,
     sorted by popularity.
     '''
-    print(f"Namequery dans la fonction a rallonge : {NameQuery}") #debugging
-    
     ActorDict2 = RechercheActeurTroisPage(NameQuery)    
     Actordict3 = MostPopularActorDict(ActorDict2)
-    
-    print(f"retour actor dict 3 : {Actordict3}")
-    
     return Actordict3
     
 
@@ -163,7 +157,6 @@ def JeuCompletFilm() -> dict[str, str]:
     
     
     Debugging = random.choice(ListPopularPeople) #Chooses random person in the popular people list of the website
-    print (f"Après Debugging : {Debugging}") #debugging
     DictFinal = {}
     DictFinal = DictMoviesOfActorID(FindPersonID(NameQueryInputActorDictPopularitySorted(str(Debugging))))
     
@@ -171,14 +164,12 @@ def JeuCompletFilm() -> dict[str, str]:
     
     
     if len(Dico2) < 15: #Number of movies the actor needs to be in to be in the list
-        print ("Hit")
+        print ("Actor found not popular enough, search again")
         DictFinal.clear()
         Dico2.clear()
         return JeuCompletFilm()
         
     else:
-        print ("aaaaaaaaaa") #debugging
-        print(f"JeuCompletFilm, Dico2 envoyé par la fonction : {Dico2}") #debugging
         return Dico2
 
 def ReduceDictToListOfTen(Dict: dict[str, str], SizeOfList:int = 5, NumberOfTopMovies:int = 3) -> list:
@@ -213,7 +204,7 @@ def Working_Game(loop: int = 0):
     '''
     Dico2 = {}
     Dico2 = JeuCompletFilm()
-    print(f"Message de Working_game Dico reçu: {Dico2}") #debugging
+    
     DicoListe = ReduceDictToListOfTen(Dico2)
     
     for key in DicoListe:    
@@ -266,7 +257,7 @@ def GetListItem():
         MovieToGuess = (f"{Liste3[NumberOfGuess]} ({GetReleaseYearOfMovie(Liste3[NumberOfGuess])})")        
         NumberOfGuess+=1
     except IndexError:
-        print ("Hint before the end !") ###########################
+        ###########################
         NumberOfGuess+=1
     return MovieToGuess
 

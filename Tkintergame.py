@@ -2,14 +2,8 @@ from tkinter import *
 from tkinter import messagebox
 import tmdbsimple as tmdb
 import requests
-import json
-import pprint
-import random
 import Testing
-import APIHEADERS
-import pyinputplus as pyip
 import sys
-import time
 from tkinter.ttk import *
 import webstream
 from PIL import ImageTk, Image
@@ -100,7 +94,7 @@ def SkipClicked():
     print(boutonclique)
     
 def create_text_label(display_text:str, x:int, y:int): #X and Y args used for .place() method
-    textrecursive = Label(window, text=display_text, font=('Arial', 10, 'bold'), justify='center')
+    textrecursive = Label(window, text=display_text, font=('Arial', 10, 'bold'), justify='center', background='light grey')
     textrecursive.pack(side=TOP)
     
     #text.place(y = y,x = x)
@@ -141,7 +135,7 @@ Notice = Label(text = "Find the actor", font= ("courier", 25, "bold"), justify=C
 Notice.pack()
 Notice2 = Label(text = "Based on the movies they were in, popularity ascending", font= ("courier", 12, "underline", "bold"), justify=CENTER, anchor=N, borderwidth=0, relief="flat", width= 0, background='#380000', foreground='light grey')
 Notice2.pack()
-CMDoutput = Label(text= "test", font= ("Helvetica", 12, "bold"), background='light blue')
+CMDoutput = Label(text= "", font= ("Helvetica", 12, "bold"), background='light blue')
 
 
 

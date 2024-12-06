@@ -16,8 +16,11 @@ Working but creates grey boxes around Labels, no solution exists
 So a unified color (that can be transparent around Labels) is used
 """
 
-urlAPI = Testing.GetPictureOne(Testing.IDActor)
-link = f"https://image.tmdb.org/t/p/original{urlAPI}"
+def PictureLink():
+    urlAPI = Testing.GetPictureOne(Testing.IDActor)
+    link = f"https://image.tmdb.org/t/p/original{urlAPI}"
+    return link
+
 class WebImage:
     def __init__(self, url):
         with urllib.request.urlopen(url) as u:

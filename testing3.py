@@ -8,5 +8,3 @@ DictTest = {'Biohazardous': 0.511, 'Tranced': 0.793, 'Law Dogs': 0.879, 'Night a
             'Polar': 27.625, '50 First Dates': 37.434, 'The Marksman': 38.329, 'The Dark Tower': 38.518, 'Love & Other Drugs': 52.651}
 DictTestName = "Katheryn Winnick"
 
-
-

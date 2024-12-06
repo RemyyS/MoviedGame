@@ -8,7 +8,7 @@ import pyinputplus as pyip
 import sys
 import testing3
 import copy
-from PIL import Image, ImageTk
+
 
 tmdb.API_KEY = f'{APIHEADERS.API}'
 tmdb.REQUESTS_TIMEOUT = (5, 10)
@@ -116,20 +116,20 @@ def GetReleaseYearOfMovie(MovieName: str) -> str:
 
 
 
-def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
+def GetPopular(Startpage: int = 1, Endpage: int = 11)-> dict[str, str]:
     '''
     Returns dictionnary of actors in the "most popular" tab,
-    from page 1 to 15 by default.
+    from page 1 to EndPage by default.
     The dictionnary includes their 'names' as keys, and original langage of their most popular movie as 'values'
     Does not add any actor to the return dictionary that doesn't have a 'en' (english as primary spoken language) movie as their most popular movie.
     (Because the most popular list is filled with unknown actors that are extremely niche to certain counrties)
-    Does not add any actor that has any popular score in movies in their "known for" below 8 (or any values set in the "JeuCompletFilm" function)
+    Does not add any actor that has any popular score in movies in their "known for" below 10 (or any values set in the "JeuCompletFilm" function)
     '''
     
     DictReturn ={}
     while Startpage < Endpage:
         url = f"https://api.themoviedb.org/3/person/popular?language=en&page={Startpage}"
-
+        
         finito = requests.get(url, headers=headers)
         finito2 = json.loads(finito.text)
         
@@ -139,7 +139,7 @@ def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
                 #print(f"{finito2['results'][number]['name']} is not english but {finito2['results'][number]['known_for'][0]['original_language']}")
                 number +=1
             elif finito2['results'][number]['known_for'][0]['popularity'] < 10 and finito2['results'][number]['known_for'][1]['popularity'] < 10 and finito2['results'][number]['known_for'][2]['popularity'] < 10:
-                #print(f"finito2['results'][number]['known_for'][0]['title'] has a popularity of finito2['results'][number]['known_for'][0]['popularity'], and every subsequent movie in the "known for" category is below 10 too")
+                #print(f"{finito2['results'][number]['known_for'][0]['title']} has a popularity of {finito2['results'][number]['known_for'][0]['popularity']}, and every subsequent movie in the 'known for' category is below 10 too")
                 number +=1
             else:
                 DictReturn[finito2['results'][number]['name']] = finito2['results'][number]['known_for'][0]['original_language']
@@ -151,7 +151,7 @@ def GetPopular(Startpage: int = 1, Endpage: int = 15)-> dict[str, str]:
 
 
 
-ListPopularPeople = list(GetPopular().keys())
+ListPopularPeople = list(GetPopular().keys()) #1
 def JeuCompletFilm() -> dict[str, str]:
     
     
@@ -250,7 +250,7 @@ def GetActorInfoOnID():
 
 
 NumberOfGuess = 0
-Liste3 = ReduceDictToListOfTen(JeuCompletFilm())
+Liste3 = ReduceDictToListOfTen(JeuCompletFilm()) #2
 def GetListItem(): 
     global NumberOfGuess
     try: 

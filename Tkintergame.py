@@ -77,10 +77,13 @@ def EntreeJoueur(e = 0): #e = 0 is used for event Return, for the user to be abl
 
         else:                            
             if UserAnswer == Testing.NameToGuess: #If the user got it right
-                CMDoutput.config(text=f"Congratulations ! It is {UserAnswer} !")
-                
-        
-    
+                CMDoutput.config(text=f"Congratulations ! It is {UserAnswer} !") #############
+                Felicitations = messagebox.askyesno(title="Try again ?",  message=f"You got it right ! \n Would you like to play again ? (It takes a few seconds to load)" )
+                if Felicitations:
+                    restart()
+                else:
+                    sys.exit()
+
     except UnboundLocalError: #Try method to catch the previous IndexError for the previous block, writing in the previous IndexError except method to set the UserAnswer string to a default value is catastrophic in future damages
         pass
     

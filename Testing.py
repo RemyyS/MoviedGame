@@ -116,7 +116,7 @@ def GetReleaseYearOfMovie(MovieName: str) -> str:
 
 
 
-def GetPopular(Startpage: int = 1, Endpage: int = 11)-> dict[str, str]:
+def GetPopular(Startpage: int = 1, Endpage: int = 20)-> dict[str, str]:
     '''
     Returns dictionnary of actors in the "most popular" tab,
     from page 1 to EndPage by default.
@@ -134,18 +134,22 @@ def GetPopular(Startpage: int = 1, Endpage: int = 11)-> dict[str, str]:
         finito2 = json.loads(finito.text)
         
         number = 0
-        for x in finito2['results']:
-            if finito2['results'][number]['known_for'][0]['original_language'] != 'en':
-                #print(f"{finito2['results'][number]['name']} is not english but {finito2['results'][number]['known_for'][0]['original_language']}")
-                number +=1
-            elif finito2['results'][number]['known_for'][0]['popularity'] < 10 and finito2['results'][number]['known_for'][1]['popularity'] < 10 and finito2['results'][number]['known_for'][2]['popularity'] < 10:
-                #print(f"{finito2['results'][number]['known_for'][0]['title']} has a popularity of {finito2['results'][number]['known_for'][0]['popularity']}, and every subsequent movie in the 'known for' category is below 10 too")
-                number +=1
-            else:
-                DictReturn[finito2['results'][number]['name']] = finito2['results'][number]['known_for'][0]['original_language']
-                number +=1
-        Startpage +=1
-        
+        try: #Try method necessary for list index out of range, in case movie doesn not have an original language set (happens often)
+            for x in finito2['results']:
+                print (x)
+                if finito2['results'][number]['known_for'][0]['original_language'] != 'en':
+                    #print(f"{finito2['results'][number]['name']} is not english but {finito2['results'][number]['known_for'][0]['original_language']}")
+                    number +=1
+                elif finito2['results'][number]['known_for'][0]['popularity'] < 10 and finito2['results'][number]['known_for'][1]['popularity'] < 10 and finito2['results'][number]['known_for'][2]['popularity'] < 10:
+                    #print(f"{finito2['results'][number]['known_for'][0]['title']} has a popularity of {finito2['results'][number]['known_for'][0]['popularity']}, and every subsequent movie in the 'known for' category is below 10 too")
+                    number +=1
+                else:
+                    DictReturn[finito2['results'][number]['name']] = finito2['results'][number]['known_for'][0]['original_language']
+                    number +=1
+            Startpage +=1
+        except IndexError:
+            Startpage +=1
+            pass
     return DictReturn
 
 
